@@ -40,8 +40,14 @@ function buildHtml(
 ): string {
   const statusColor = gate.pipelineStatus === 'PASS' ? '#10b981' : gate.pipelineStatus === 'FAIL' ? '#ef4444' : '#f59e0b';
   const statusIcon = gate.pipelineStatus === 'PASS' ? '✅' : gate.pipelineStatus === 'FAIL' ? '❌' : '⚠️';
+  const validatorStatusMap: Record<string, string> = {
+      'IMPROVED': 'STABILITY ENHANCED (Healed)',
+      'SAME': exec.passed === exec.totalTests ? 'No Self Healing done all tests passed' : 'STABLE (No Change)',
+      'REGRESSED': 'ACTION REQUIRED (Regressed)'
+    };
+    const displayStatus = validatorStatusMap[validation.status] || validation.status;
 
-  return `
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -204,10 +210,10 @@ function buildHtml(
                         </div>
                         <div class="pt-4 border-t border-indigo-400">
                              <div class="text-xs opacity-80 uppercase tracking-widest font-bold">Healer Outcome status:</div>
-                             <div class="text-xl font-bold mt-1">${validation.status}</div>
+                             <div class="text-xl font-bold mt-1">${displayStatus}</div>
                         </div>
                     </div>
-                </section>
+                </section>      </section>
 
                 <!-- Configuration Info -->
                 <section class="card p-6">
@@ -281,3 +287,5 @@ function buildHtml(
 }
 
 generate();
+
+
