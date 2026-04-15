@@ -18,6 +18,7 @@
     "ai:heal": "tsx agents/self-healer.ts",
     "ai:validate": "tsx agents/validator.ts",
     "ai:quality-gate": "tsx agents/quality-gate.ts",
+    "ai:report": "tsx scripts/generate-html-report.ts",
     "ai:pipeline": "tsx scripts/pipeline.ts",
     "ai:bootstrap": "tsx scripts/bootstrap.ts",
     "prepare": "tsx scripts/prepare-folders.ts"

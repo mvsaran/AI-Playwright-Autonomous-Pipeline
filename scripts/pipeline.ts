@@ -74,6 +74,12 @@ const STEPS: PipelineStep[] = [
     failFast: true,
     requiresFile: Paths.validationReport(),
   },
+  {
+    name: '9 — Generate HTML Report',
+    script: 'scripts/generate-html-report.ts',
+    failFast: false,
+    requiresFile: Paths.finalQualityGate(),
+  },
 ];
 
 function runStep(step: PipelineStep): boolean {

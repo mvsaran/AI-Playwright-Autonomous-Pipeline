@@ -93,6 +93,10 @@ jobs:
         run: npm run ai:quality-gate
         # This step WILL fail the job if quality gate is FAIL
 
+      - name: Step 9 — Generate HTML Dashboard
+        run: npm run ai:report
+        if: always()
+
       # ── Artifacts & Reports ───────────────────────────────────────
 
       - name: Upload Playwright HTML Report
@@ -111,12 +115,14 @@ jobs:
           path: agents/output/
           retention-days: 30
 
-      - name: Upload Final Summary Report
+      - name: Upload Final Summary Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: final-summary
-          path: reports/final-summary.md
+          name: autonomous-dashboard
+          path: |
+            reports/final-summary.md
+            reports/autonomous-report.html
           retention-days: 30
 
       - name: Upload Test Artifacts (screenshots/traces)
