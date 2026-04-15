@@ -56,7 +56,6 @@ This project implements an **Autonomous QA Lifecycle**. Unlike traditional frame
 ```
 
 ### The Autonomous Loop
-
 The pipeline operates in a closed-loop system where each stage feeds the next with structured JSON data:
 1. **Analyze**: AI reads your `requirements/feature.md`.
 2. **Plan**: AI creates the test scenarios.
@@ -64,6 +63,25 @@ The pipeline operates in a closed-loop system where each stage feeds the next wi
 4. **Diagnose**: Failure Analyzer classifies the root cause.
 5. **Heal**: Self-Healer modifies code for locator/timing fixes.
 6. **Gate**: Quality Gate makes the Go/No-Go decision.
+
+---
+
+## 🧠 What makes this Pipeline "Autonomous"?
+
+A common question is: *If I have to run a command, how is it autonomous?* 
+
+Autonomy in this framework refers to **Zero-Touch Maintenance**. In traditional automation, a broken selector requires a human developer to investigate, debug, and patch the code. In this pipeline:
+
+| Feature | Traditional Automation | This AI Pipeline |
+| :--- | :--- | :--- |
+| **Failure Detection** | Human checks logs | AI Failure Analyzer identifies root cause |
+| **Maintenance** | Human manually edits selectors | **AI Self-Healer automatically patches code** |
+| **Verification** | Human re-runs tests | AI Validator verifies the fix immediately |
+| **Decision Making** | Human decides to Release/Fail | AI Quality Gate makes the final call |
+
+**The result:** The "Maintenance Burden" is shifted from the tester to the AI. Once triggered, the pipeline repairs itself without a human ever touching the code.
+
+---
 
 ### 1. Requirements & Planning
 - **Requirement Analyzer**: Digests raw Markdown requirements and identifies modules, user journeys, edge cases, and priorities.
@@ -122,16 +140,44 @@ npm run ai:bootstrap
 
 ## ⚙️ How to Implement & Trigger
 
-### Local Execution:
-Run the entire loop from your terminal:
+### 🛠 Manual Agent Control (Step-by-Step)
+If you want to run specific agents manually:
 ```bash
-npm run ai:pipeline
+npm run ai:execute           # 1. Run Playwright Tests
+npm run ai:analyze-failures  # 2. Diagnose Failures (if any)
+npm run ai:heal              # 3. Apply AI Self-Healing
+npm run ai:validate          # 4. Verify Healed Tests
+npm run ai:report            # 5. Generate Dashboard
 ```
 
-### GitHub Actions (The "Fully Autonomous" Part):
+### 🎯 Proving Self-Healing (The Demo Case)
+To see the system in action:
+1.  **Break a Locator**: Deliberately change a selector in `tests/generated/auth.spec.ts` (e.g., change `login-button` to `broken-locator`).
+2.  **Run Pipeline**: Execute `npm run ai:pipeline`.
+3.  **Result**: 
+    *   **Phase 4** will report a failure.
+    *   **Phase 5** will analyze it as a `locator_issue`.
+    *   **Phase 6 (Healer)** will automatically patch the code back to the original selector.
+    *   **Report**: The final `autonomous-report.html` will show **"STABILITY ENHANCED (Healed)"** status.
+
+
+### 🚀 GitHub Actions (The "Fully Autonomous" Part):
 1. **Add Secrets**: Go to your GitHub Repo Settings → Secrets → Actions. Add `OPENAI_API_KEY`.
 2. **Push to Main**: Any push to `main` triggers a full run.
 3. **Manual Trigger**: Go to **Actions** tab → **AI Playwright Autonomous Pipeline** → **Run workflow**.
+
+---
+
+## 📊 Pipeline Reports & Artifacts
+
+After a run, you can find detailed intelligence here:
+
+| Report | Location |
+|:---|:---|
+| **Visual Dashboard** | `reports/autonomous-report.html` |
+| **Failure Analysis** | `agents/output/failure-analysis.json` |
+| **Healing Actions** | `agents/output/healing-action.json` |
+| **Quality Gate Info** | `agents/output/final-quality-gate.json` |
 
 ---
 
