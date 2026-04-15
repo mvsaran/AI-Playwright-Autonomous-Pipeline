@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GeneratedTestMetadata",
+  "type": "object",
+  "required": ["metadataId", "timestamp", "sourcePlanId", "generatedFiles"],
+  "properties": {
+    "metadataId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "sourcePlanId": { "type": "string" },
+    "generatedFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filePath", "scenarioIds", "module"],
+        "properties": {
+          "filePath": { "type": "string" },
+          "scenarioIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "module": { "type": "string" },
+          "testCount": { "type": "number" },
+          "generatedBy": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "totalTestsGenerated": { "type": "number" },
+    "strategy": { "type": "string" }
+  }
+}

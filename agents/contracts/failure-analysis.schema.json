@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FailureAnalysis",
+  "type": "object",
+  "required": ["analysisId", "timestamp", "sourceExecutionId", "failures"],
+  "properties": {
+    "analysisId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "sourceExecutionId": { "type": "string" },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "testId",
+          "title",
+          "failureType",
+          "errorMessage",
+          "filePath",
+          "confidence",
+          "reasoning",
+          "healable"
+        ],
+        "properties": {
+          "testId": { "type": "string" },
+          "title": { "type": "string" },
+          "failureType": {
+            "type": "string",
+            "enum": [
+              "locator_issue",
+              "timing_issue",
+              "assertion_issue",
+              "data_issue",
+              "environment_issue",
+              "flaky",
+              "probable_app_bug"
+            ]
+          },
+          "errorMessage": { "type": "string" },
+          "filePath": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "reasoning": { "type": "string" },
+          "healable": { "type": "boolean" },
+          "suggestedFix": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "totalFailures": { "type": "number" },
+        "healableCount": { "type": "number" },
+        "probableAppBugs": { "type": "number" },
+        "byType": { "type": "object" }
+      }
+    }
+  }
+}

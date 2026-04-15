@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExecutionSummary",
+  "type": "object",
+  "required": [
+    "executionId",
+    "timestamp",
+    "totalTests",
+    "passed",
+    "failed",
+    "skipped",
+    "passRate",
+    "durationMs",
+    "reportPath",
+    "status"
+  ],
+  "properties": {
+    "executionId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "totalTests": { "type": "number" },
+    "passed": { "type": "number" },
+    "failed": { "type": "number" },
+    "skipped": { "type": "number" },
+    "passRate": { "type": "number", "minimum": 0, "maximum": 100 },
+    "durationMs": { "type": "number" },
+    "reportPath": { "type": "string" },
+    "artifactPaths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "failedTests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["testId", "title", "errorMessage", "filePath"],
+        "properties": {
+          "testId": { "type": "string" },
+          "title": { "type": "string" },
+          "errorMessage": { "type": "string" },
+          "filePath": { "type": "string" },
+          "screenshotPath": { "type": "string" },
+          "tracePath": { "type": "string" }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "PARTIAL"]
+    }
+  }
+}

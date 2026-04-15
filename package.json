@@ -1,0 +1,38 @@
+{
+  "name": "ai-playwright-autonomous-pipeline",
+  "version": "1.0.0",
+  "description": "AI-Driven Autonomous Test Automation Pipeline using Playwright, TypeScript, and OpenAI",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "playwright test",
+    "test:generated": "playwright test tests/generated/",
+    "test:baseline": "playwright test tests/baseline/",
+    "ai:analyze": "tsx agents/requirement-analyzer.ts",
+    "ai:plan": "tsx agents/test-planner.ts",
+    "ai:generate": "tsx agents/test-generator.ts",
+    "ai:execute": "tsx scripts/execute-tests.ts",
+    "ai:analyze-failures": "tsx agents/failure-analyzer.ts",
+    "ai:heal": "tsx agents/self-healer.ts",
+    "ai:validate": "tsx agents/validator.ts",
+    "ai:quality-gate": "tsx agents/quality-gate.ts",
+    "ai:pipeline": "tsx scripts/pipeline.ts",
+    "ai:bootstrap": "tsx scripts/bootstrap.ts",
+    "prepare": "tsx scripts/prepare-folders.ts"
+  },
+  "dependencies": {
+    "openai": "^4.47.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.12",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

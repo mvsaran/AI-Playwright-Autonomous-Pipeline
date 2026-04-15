@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ValidationReport",
+  "type": "object",
+  "required": [
+    "reportId",
+    "timestamp",
+    "sourceHealingId",
+    "totalReRun",
+    "nowPassing",
+    "stillFailing",
+    "status"
+  ],
+  "properties": {
+    "reportId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "sourceHealingId": { "type": "string" },
+    "totalReRun": { "type": "number" },
+    "nowPassing": { "type": "number" },
+    "stillFailing": { "type": "number" },
+    "healingSuccessRate": { "type": "number", "minimum": 0, "maximum": 100 },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["testId", "title", "status"],
+        "properties": {
+          "testId": { "type": "string" },
+          "title": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["PASS", "FAIL", "SKIP"]
+          },
+          "errorMessage": { "type": "string" },
+          "healingApplied": { "type": "boolean" }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["IMPROVED", "SAME", "REGRESSED"]
+    },
+    "notes": { "type": "string" }
+  }
+}

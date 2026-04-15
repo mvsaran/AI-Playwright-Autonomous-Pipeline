@@ -1,0 +1,161 @@
+name: AI Playwright Autonomous Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_label:
+        description: 'Label for this pipeline run'
+        required: false
+        default: 'manual-run'
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  autonomous-pipeline:
+    name: AI Autonomous Test Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4o' }}
+      OPENAI_MAX_TOKENS: '4096'
+      OPENAI_TEMPERATURE: '0.2'
+      BASE_URL: 'https://automationexercise.com'
+      HEADLESS: 'true'
+      SLOW_MO: '0'
+      PASS_THRESHOLD: '70'
+      WARN_THRESHOLD: '50'
+      RUN_LABEL: ${{ github.event.inputs.run_label || github.event_name }}
+      AGENTS_OUTPUT_DIR: 'agents/output'
+      REPORTS_DIR: 'reports'
+      ARTIFACTS_DIR: 'artifacts'
+      TESTS_GENERATED_DIR: 'tests/generated'
+
+    steps:
+      # ── Setup ──────────────────────────────────────────────────────
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers (Chromium only)
+        run: npx playwright install chromium --with-deps
+
+      - name: Prepare output directories
+        run: npx tsx scripts/prepare-folders.ts
+
+      # ── Pipeline Steps ────────────────────────────────────────────
+
+      - name: Step 1 — Requirement Analyzer Agent
+        run: npm run ai:analyze
+
+      - name: Step 2 — Test Planner Agent
+        run: npm run ai:plan
+
+      - name: Step 3 — Test Generator Agent
+        run: npm run ai:generate
+
+      - name: Step 4 — Execute Tests
+        run: npm run ai:execute
+        continue-on-error: true   # Don't stop pipeline if tests fail
+
+      - name: Step 5 — Failure Analyzer Agent
+        run: npm run ai:analyze-failures
+        continue-on-error: true
+
+      - name: Step 6 — Self-Healer Agent
+        run: npm run ai:heal
+        continue-on-error: true
+
+      - name: Step 7 — Validator Agent
+        run: npm run ai:validate
+        continue-on-error: true
+
+      - name: Step 8 — Quality Gate Agent
+        run: npm run ai:quality-gate
+        # This step WILL fail the job if quality gate is FAIL
+
+      # ── Artifacts & Reports ───────────────────────────────────────
+
+      - name: Upload Playwright HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload Agent Output JSONs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-outputs
+          path: agents/output/
+          retention-days: 30
+
+      - name: Upload Final Summary Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-summary
+          path: reports/final-summary.md
+          retention-days: 30
+
+      - name: Upload Test Artifacts (screenshots/traces)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: artifacts/
+          retention-days: 14
+
+      - name: Upload Playwright JSON Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-json-results
+          path: reports/playwright-results.json
+          retention-days: 14
+
+      # ── Summary ───────────────────────────────────────────────────
+
+      - name: Print Final Summary to Job Log
+        if: always()
+        run: |
+          if [ -f reports/final-summary.md ]; then
+            echo "════════════════════════════════════════"
+            cat reports/final-summary.md
+            echo "════════════════════════════════════════"
+          else
+            echo "Final summary report not found."
+          fi
+
+      - name: Check Quality Gate Status
+        if: always()
+        run: |
+          if [ -f agents/output/final-quality-gate.json ]; then
+            STATUS=$(node -e "const g=require('./agents/output/final-quality-gate.json'); console.log(g.pipelineStatus)")
+            echo "Pipeline Status: $STATUS"
+            if [ "$STATUS" = "FAIL" ]; then
+              echo "::error::Quality Gate FAILED — pipeline did not meet pass threshold."
+              exit 1
+            fi
+          fi

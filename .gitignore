@@ -1,0 +1,47 @@
+# Node
+node_modules/
+dist/
+*.js.map
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Reports & Artifacts (keep folder, not contents)
+reports/*
+!reports/.gitkeep
+artifacts/*
+!artifacts/.gitkeep
+
+# Agent outputs (generated at runtime)
+agents/output/*.json
+
+# Generated tests (committed as examples, but runtime output excluded)
+tests/generated/*.healed.ts
+
+# Healed backups
+tests/generated/*.backup.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript build info
+*.tsbuildinfo

@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RequirementAnalysis",
+  "type": "object",
+  "required": [
+    "analysisId",
+    "timestamp",
+    "featureSummary",
+    "scope",
+    "assumptions",
+    "risks",
+    "userJourneys",
+    "edgeCases",
+    "negativeScenarios",
+    "priorities"
+  ],
+  "properties": {
+    "analysisId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "featureSummary": { "type": "string", "minLength": 10 },
+    "scope": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "userJourneys": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "steps", "priority"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "steps": { "type": "array", "items": { "type": "string" } },
+          "priority": { "type": "string", "enum": ["high", "medium", "low"] }
+        }
+      }
+    },
+    "edgeCases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "negativeScenarios": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "priorities": {
+      "type": "object",
+      "required": ["high", "medium", "low"],
+      "properties": {
+        "high": { "type": "array", "items": { "type": "string" } },
+        "medium": { "type": "array", "items": { "type": "string" } },
+        "low": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "confidenceScore": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}

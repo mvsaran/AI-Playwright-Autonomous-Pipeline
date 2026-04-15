@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FinalQualityGate",
+  "type": "object",
+  "required": [
+    "gateId",
+    "timestamp",
+    "pipelineStatus",
+    "passRate",
+    "thresholds",
+    "decision",
+    "summary"
+  ],
+  "properties": {
+    "gateId": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "pipelineStatus": {
+      "type": "string",
+      "enum": ["PASS", "PASS_WITH_WARNINGS", "FAIL"]
+    },
+    "passRate": { "type": "number", "minimum": 0, "maximum": 100 },
+    "thresholds": {
+      "type": "object",
+      "required": ["pass", "warn"],
+      "properties": {
+        "pass": { "type": "number" },
+        "warn": { "type": "number" }
+      }
+    },
+    "decision": { "type": "string" },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "totalTests": { "type": "number" },
+        "passed": { "type": "number" },
+        "failed": { "type": "number" },
+        "healed": { "type": "number" },
+        "unresolvedFailures": { "type": "number" },
+        "probableAppBugs": { "type": "number" }
+      }
+    },
+    "summary": { "type": "string" },
+    "reportPath": { "type": "string" },
+    "blockers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
