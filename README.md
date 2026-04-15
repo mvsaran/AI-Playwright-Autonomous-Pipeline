@@ -16,22 +16,54 @@ This project implements an **Autonomous QA Lifecycle**. Unlike traditional frame
 
 ---
 
-## 🚀 How it works: The Autonomous Loop
+## 🏗️ Project Architecture: Layered Autonomous System
 
-The pipeline operates in a closed-loop system where each stage feeds the next with structured JSON data.
-
-```mermaid
-graph TD
-    A[Requirement: feature.md] --> B[Agent 1: Requirement Analyzer]
-    B -->|req-analysis.json| C[Agent 2: Test Planner]
-    C -->|test-plan.json| D[Agent 3: Test Generator]
-    D -->|metadata.json| E[Script: Playwright Executor]
-    E -->|exec-summary.json| F[Agent 4: Failure Analyzer]
-    F -->|failure-analysis.json| G[Agent 5: Self-Healer]
-    G -->|healing-action.json| H[Agent 6: Validator]
-    H -->|validation-report.json| I[Agent 7: Quality Gate]
-    I --> J{Release? PASS/FAIL}
+```text
+┌─────────────────────────────────────────────────────────────┐
+│          Layer 1: Application & Testing Environment         │
+│  ┌──────────────┐                  ┌──────────────┐         │
+│  │  Demo App    │◀────────────────▶│  Playwright  │         │
+│  │  (AE Website)│                  │  E2E Suite   │         │
+│  └──────────────┘                  └──────────────┘         │
+└────────────────────┬────────────────────────────────────────┘
+                     │ Test Failure
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│             Layer 2: Test Result Extraction                 │
+│                 ┌──────────────────────┐                    │
+│                 │   Playwright JSON    │                    │
+│                 │   Failure Payload    │                    │
+│                 └──────────────────────┘                    │
+└────────────────────┬────────────────────────────────────────┘
+                     │ Analyzes JSON
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│         Layer 3: AI Multi-Agent Orchestrator System         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │   Planner    │─▶│   Analyzer   │─▶│   Healer     │       │
+│  │    Agent     │  │    Agent     │  │    Agent     │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└────────────────────┬────────────────────────────────────────┘
+                     │ Diagnosis & Policy
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│           Layer 4: CI/CD Resolution & Enforcement           │
+│  ┌──────────────┐      ┌───────────────┐                    │
+│  │ Automated MD │─────▶│ GitHub Actions │                    │
+│  │   Summary    │      │ Quality Gate  │                    │
+│  └──────────────┘      └───────────────┘                    │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+### The Autonomous Loop
+
+The pipeline operates in a closed-loop system where each stage feeds the next with structured JSON data:
+1. **Analyze**: AI reads your `requirements/feature.md`.
+2. **Plan**: AI creates the test scenarios.
+3. **Execute**: Playwright runs the tests.
+4. **Diagnose**: Failure Analyzer classifies the root cause.
+5. **Heal**: Self-Healer modifies code for locator/timing fixes.
+6. **Gate**: Quality Gate makes the Go/No-Go decision.
 
 ### 1. Requirements & Planning
 - **Requirement Analyzer**: Digests raw Markdown requirements and identifies modules, user journeys, edge cases, and priorities.
