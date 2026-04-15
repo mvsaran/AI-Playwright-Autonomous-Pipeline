@@ -121,12 +121,32 @@ npm run ai:bootstrap
 ---
 
 ## ⚙️ How to Implement & Trigger
-
 ### Local Execution:
 Run the entire loop from your terminal:
 ```bash
 npm run ai:pipeline
 ```
+### 🛠 Manual Agent Control (Step-by-Step)
+If you want to run specific agents manually:
+```bash
+npm run ai:execute           # 1. Run Playwright Tests
+npm run ai:analyze-failures  # 2. Diagnose Failures (if any)
+npm run ai:heal              # 3. Apply AI Self-Healing
+npm run ai:validate          # 4. Verify Healed Tests
+npm run ai:report            # 5. Generate Dashboard
+```
+
+### 🎯 Proving Self-Healing (The Demo Case)
+To see the system in action:
+1.  **Break a Locator**: Deliberately change a selector in `tests/generated/auth.spec.ts` (e.g., change `login-button` to `broken-locator`).
+2.  **Run Pipeline**: Execute `npm run ai:pipeline`.
+3.  **Result**: 
+    *   **Phase 4** will report a failure.
+    *   **Phase 5** will analyze it as a `locator_issue`.
+    *   **Phase 6 (Healer)** will automatically patch the code back to the original selector.
+    *   **Report**: The final `autonomous-report.html` will show **"STABILITY ENHANCED (Healed)"** status.
+
+
 
 ### GitHub Actions (The "Fully Autonomous" Part):
 1. **Add Secrets**: Go to your GitHub Repo Settings → Secrets → Actions. Add `OPENAI_API_KEY`.
