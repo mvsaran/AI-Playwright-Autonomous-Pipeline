@@ -55,6 +55,41 @@ This project implements an **Autonomous QA Lifecycle**. Unlike traditional frame
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## 🚀 The Complete Autonomous Workflow: Requirement to Result
+
+This section details exactly how the system operates from the moment a requirement is added to the final HTML report.
+
+### Step 1: Requirement Ingestion & Planning
+*   **Input**: A plain text Markdown file (e.g., `requirements/cart.md`).
+*   **The Brain (Planner Agent)**: The AI reads the English requirements and translates them into a **Test Plan (JSON)**. This plan includes specific user actions (Click, Type, Select) and expected validations (Assert URL, Assert Visibility).
+*   **The Outcome**: A structured roadmap of "Test Scenarios" that the AI intends to build.
+
+### Step 2: Zero-Code Test Generation & Locator Discovery
+*   **The Brain (Generator Agent)**: The AI reads the Test Plan and our existing **Page Object Models (POMs)** in `pages/`. 
+*   **No-Interaction Discovery**: The AI identifies locators by mapping the intended user action to the semantic constants in the POMs. For example, if the plan says "Click Login", the AI searches the `LoginPage` class for a locator like `loginButton`.
+*   **Code Output**: The AI generates a full Playwright `.spec.ts` file. It automatically handles imports, test structure, and asynchronous flows.
+
+### Step 3: Parallel Execution Strategy
+*   **High-Speed Execution**: The pipeline uses Playwright's **Parallel Workers** (configurable in `playwright.config.ts`, currently set to 4).
+*   **Isolation**: Multiple browser instances are launched simultaneously. This allows the system to run 20+ tests in under 2 minutes, even on slow-responding web applications.
+*   **Stability**: The system uses elevated `navigationTimeout` (30s) and `actionTimeout` (10s) to ensure parallel load doesn't cause false failures.
+
+### Step 4: The Failure-to-Healing Loop (Self-Correcting)
+If a test fails (e.g., due to a UI change):
+1.  **Extraction**: The system captures a screenshot, the failing line of code, and a JSON dump of the failure.
+2.  **Analysis**: The **Failure-Analyzer** determines if it's a "Healable" issue.
+3.  **Healing**: The **Self-Healer** reads the **Full Source File** and suggests a surgical code update (e.g., updating a timeout or a locator).
+4.  **Verification**: The **Validator Agent** re-runs the specific failing test to confirm the fix works. If it passes, it updates the "Historical Memory".
+
+### Step 5: CI/CD Quality Gate & HTML Dashboard
+*   **The Decision**: The **Quality Gate Agent** evaluates the total run. It decides if the build is a "PASS" or "FAIL" based on whether 100% of failures were successfully healed.
+*   **The Report**: A beautiful, premium HTML report is generated at `reports/autonomous-report.html`. It includes:
+    *   **Success Metrics**: Pass rate, healing success rate, and run time.
+    *   **AI Intelligence**: Detailed diffs of AI-generated fixes and failure analysis.
+    *   **ROI Tracking**: Calculated cost savings of using AI vs. manual test maintenance.
+
+---
+
 ### The Autonomous Loop
 
 The pipeline operates in a closed-loop system where each stage feeds the next with structured JSON data:
