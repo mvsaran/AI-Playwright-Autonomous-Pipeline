@@ -68,6 +68,8 @@ export class HomePage extends BasePage {
     await this.clickNav('Signup / Login');
   }
 
+
+
   /** Navigate to Products page. */
   async goToProducts(): Promise<void> {
     await this.clickNav('Products');

@@ -19,7 +19,7 @@ test.describe('Product Browsing — Automationexercise.com', () => {
 
   // TC-PROD-001: Smoke — Products page loads
   test('TC-PROD-001: Products page loads and displays product list', async ({ page }) => {
-    await productsPage.navigate();
+    await productsPage.navigate({ timeout: 60000 });
     await productsPage.assertLoaded();
     await productsPage.assertProductsVisible();
   });

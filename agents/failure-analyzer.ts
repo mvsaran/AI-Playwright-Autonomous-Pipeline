@@ -9,7 +9,8 @@ import { callAI } from '../utils/openai-client';
 import { logger } from '../utils/logger';
 import { Paths, generateId, nowIso } from '../utils/run-context';
 import type { ExecutionSummary } from '../types/execution';
-import type { FailureAnalysis, FailureSummary, FailureType } from '../types/failure';
+import type { FailureAnalysis, FailureType } from '../types/failure';
+import { getHealingMemory } from '../utils/db-utils';
 
 const CONTEXT = 'FailureAnalyzer';
 
@@ -20,7 +21,6 @@ async function analyze(): Promise<void> {
 
   if (summary.failedTests.length === 0) {
     logger.success(CONTEXT, 'No failures to analyze — all tests passed!');
-
     const emptyAnalysis: FailureAnalysis = {
       analysisId: generateId('failure-analysis'),
       timestamp: nowIso(),
@@ -33,47 +33,52 @@ async function analyze(): Promise<void> {
         byType: {} as Record<FailureType, number>,
       },
     };
-
     ensureDir(Paths.agentsOutput);
     writeJson(Paths.failureAnalysis(), emptyAnalysis);
-    logger.success(CONTEXT, `Empty failure analysis written to: ${Paths.failureAnalysis()}`);
     return;
   }
 
-  logger.info(CONTEXT, `Analyzing ${summary.failedTests.length} failed test(s)...`);
+  logger.info(CONTEXT, `Analyzing ${summary.failedTests.length} failed test(s) with Healing Memory...`);
 
   const systemPrompt = readFile(`${Paths.prompts}/failure-analyzer.prompt.md`);
 
-  const userPrompt = `
-Analyze the following Playwright test execution failures and classify each one.
+  const enrichedFailures = summary.failedTests.map(f => {
+    const memory = getHealingMemory(f.testId);
+    return {
+      ...f,
+      pastHealingAttempts: memory.length,
+      lastHealedAt: memory.length > 0 ? memory[memory.length - 1].timestamp : null,
+      wasEverHealed: memory.some(m => m.fixApplied)
+    };
+  });
 
-=== EXECUTION SUMMARY ===
-${JSON.stringify(summary, null, 2)}
+  const userPrompt = `
+Analyze the following Playwright test execution failures. Context from past runs (Healing Memory) is included.
+
+=== EXECUTION SUMMARY WITH MEMORY ===
+${JSON.stringify({ ...summary, failedTests: enrichedFailures }, null, 2)}
 === END ===
 
-Generate a unique analysisId, use the current timestamp, and return ONLY the JSON object.
+Return ONLY a JSON failure analysis object.
 `.trim();
 
   const rawResponse = await callAI(systemPrompt, userPrompt, CONTEXT);
   const analysis = extractAndParseJson<FailureAnalysis>(rawResponse, CONTEXT);
 
-  // Ensure required fields
-  if (!analysis.analysisId) analysis.analysisId = generateId('failure-analysis');
-  if (!analysis.timestamp) analysis.timestamp = nowIso();
-  if (!analysis.sourceExecutionId) analysis.sourceExecutionId = summary.executionId;
+  // Fallback for ID, timestamp and execution summary
+  analysis.analysisId = analysis.analysisId || generateId('failure-analysis');
+  analysis.timestamp = analysis.timestamp || nowIso();
+  analysis.sourceExecutionId = summary.executionId;
 
-  // Compute summary if AI didn't populate it
   if (!analysis.summary) {
     const byType: Partial<Record<FailureType, number>> = {};
     let healableCount = 0;
     let probableAppBugs = 0;
-
     for (const f of analysis.failures) {
       byType[f.failureType] = (byType[f.failureType] ?? 0) + 1;
       if (f.healable) healableCount++;
       if (f.failureType === 'probable_app_bug') probableAppBugs++;
     }
-
     analysis.summary = {
       totalFailures: analysis.failures.length,
       healableCount,
@@ -85,11 +90,8 @@ Generate a unique analysisId, use the current timestamp, and return ONLY the JSO
   ensureDir(Paths.agentsOutput);
   writeJson(Paths.failureAnalysis(), analysis);
 
-  logger.success(CONTEXT, `Failure analysis written to: ${Paths.failureAnalysis()}`);
-  logger.info(CONTEXT, `  → Total Failures: ${analysis.summary.totalFailures}`);
-  logger.info(CONTEXT, `  → Healable: ${analysis.summary.healableCount}`);
-  logger.info(CONTEXT, `  → Probable App Bugs: ${analysis.summary.probableAppBugs}`);
-  logger.info(CONTEXT, `  → By Type: ${JSON.stringify(analysis.summary.byType)}`);
+  logger.success(CONTEXT, `Analysis written to: ${Paths.failureAnalysis()}`);
+  logger.info(CONTEXT, `  → Failures: ${analysis.summary.totalFailures} | Healable: ${analysis.summary.healableCount}`);
 }
 
 analyze().catch((err) => {

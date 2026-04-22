@@ -159,8 +159,24 @@ async function runPipeline(): Promise<void> {
     }
   }
 
+  // Final Historical Summary
+  try {
+    const { getProjectSummary } = await import('../utils/db-utils');
+    const projectSummary = getProjectSummary();
+    if (projectSummary) {
+      logger.separator('PROJECT HISTORICAL SUMMARY');
+      logger.info(CONTEXT, `Total Runs: ${projectSummary.totalRuns}`);
+      logger.info(CONTEXT, `Avg Pass Rate: ${projectSummary.avgPassRate}%`);
+      logger.info(CONTEXT, `Total Tests Healed: ${projectSummary.totalHealed}`);
+      logger.success(CONTEXT, `Total Automation Cost (ROI): $${projectSummary.totalCost}`);
+    }
+  } catch (err) {
+    logger.warn(CONTEXT, 'Could not load historical summary.');
+  }
+
   logger.success(CONTEXT, 'Pipeline PASSED successfully.');
 }
+
 
 runPipeline().catch((err) => {
   logger.error(CONTEXT, 'Unexpected pipeline error.', err);

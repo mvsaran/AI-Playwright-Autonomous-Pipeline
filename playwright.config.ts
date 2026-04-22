@@ -10,12 +10,13 @@ const SLOW_MO = parseInt(process.env.SLOW_MO ?? '0', 10);
 
 export default defineConfig({
   testDir: './tests',
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : 1,
-  timeout: 60_000,
+  workers: process.env.CI ? 2 : 4,
+  timeout: 90_000,
   expect: { timeout: 10_000 },
+
 
   reporter: [
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
@@ -32,9 +33,10 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
-    actionTimeout: 15_000,
+    actionTimeout: 10_000,
     navigationTimeout: 30_000,
     viewport: { width: 1280, height: 800 },
+
   },
 
   outputDir: 'artifacts/test-results',

@@ -11,6 +11,9 @@ import { Paths, Thresholds, RUN_LABEL, generateId, nowIso } from '../utils/run-c
 import type { ExecutionSummary } from '../types/execution';
 import type { FailureAnalysis, ValidationReport, FinalQualityGate } from '../types/failure';
 
+import { saveRun } from '../utils/db-utils';
+import { getGlobalUsage } from '../utils/usage-tracker';
+
 const CONTEXT = 'QualityGate';
 
 async function gate(): Promise<void> {
@@ -19,6 +22,7 @@ async function gate(): Promise<void> {
   const execution = readJson<ExecutionSummary>(Paths.executionSummary());
   const failureAnalysis = readJson<FailureAnalysis>(Paths.failureAnalysis());
   const validation = readJson<ValidationReport>(Paths.validationReport());
+  const usage = getGlobalUsage();
 
   const systemPrompt = readFile(`${Paths.prompts}/quality-gate.prompt.md`);
 
@@ -33,6 +37,9 @@ ${JSON.stringify(failureAnalysis, null, 2)}
 
 === VALIDATION REPORT ===
 ${JSON.stringify(validation, null, 2)}
+
+=== USAGE STATS ===
+${JSON.stringify(usage, null, 2)}
 
 === THRESHOLDS ===
 Pass threshold: ${Thresholds.pass}%
@@ -81,15 +88,28 @@ Return ONLY the JSON quality gate object.
   ensureDir(Paths.reports);
   writeJson(Paths.finalQualityGate(), qualityGate);
 
+  // Persistence: Save to DB
+  saveRun({
+    runId: qualityGate.gateId,
+    label: RUN_LABEL,
+    timestamp: qualityGate.timestamp,
+    durationMs: execution.durationMs,
+    passRate: qualityGate.passRate,
+    status: qualityGate.pipelineStatus,
+    healedTests: healed,
+    totalTests: qualityGate.metrics.totalTests,
+    cost: usage.cost_estimate,
+  });
+
   // Generate human-readable markdown summary
-  const markdown = buildMarkdownSummary(qualityGate, execution, validation);
+  const markdown = buildMarkdownSummary(qualityGate, execution, validation, usage);
   writeFile(Paths.finalSummary(), markdown);
 
   logger.success(CONTEXT, `Quality gate written to: ${Paths.finalQualityGate()}`);
   logger.success(CONTEXT, `Final summary written to: ${Paths.finalSummary()}`);
   logger.separator(`PIPELINE STATUS: ${qualityGate.pipelineStatus}`);
   logger.info(CONTEXT, `  → Pass Rate: ${passRate}%`);
-  logger.info(CONTEXT, `  → Decision: ${qualityGate.decision}`);
+  logger.info(CONTEXT, `  → Total Cost: $${usage.cost_estimate.toFixed(4)}`);
 
   if (qualityGate.pipelineStatus === 'FAIL') {
     process.exitCode = 1;
@@ -99,7 +119,8 @@ Return ONLY the JSON quality gate object.
 function buildMarkdownSummary(
   gate: FinalQualityGate,
   exec: ExecutionSummary,
-  validation: ValidationReport
+  validation: ValidationReport,
+  usage: any
 ): string {
   const statusEmoji =
     gate.pipelineStatus === 'PASS' ? '✅' :
@@ -129,6 +150,12 @@ ${gate.summary}
 | Unresolved Failures | ${gate.metrics?.unresolvedFailures ?? 'N/A'} |
 | Probable App Bugs | ${gate.metrics?.probableAppBugs ?? 'N/A'} |
 
+## 💵 Run Cost Summary
+- **Prompt Tokens:** ${usage.prompt_tokens}
+- **Completion Tokens:** ${usage.completion_tokens}
+- **Total Tokens:** ${usage.total_tokens}
+- **Estimated Cost:** $${usage.cost_estimate.toFixed(4)}
+
 ## Decision
 
 > ${gate.decision}
@@ -154,6 +181,7 @@ ${gate.warnings && gate.warnings.length > 0 ? `## ⚠️ Warnings\n\n${gate.warn
 - Quality Gate JSON: \`agents/output/final-quality-gate.json\`
 `;
 }
+
 
 gate().catch((err) => {
   logger.error(CONTEXT, 'Quality gate failed.', err);

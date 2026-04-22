@@ -8,7 +8,7 @@ import { readJson } from '../utils/json-utils';
 import { Paths, RUN_LABEL } from '../utils/run-context';
 import { logger } from '../utils/logger';
 import type { ExecutionSummary } from '../types/execution';
-import type { FailureAnalysis, ValidationReport, FinalQualityGate } from '../types/failure';
+import type { FailureAnalysis, ValidationReport, FinalQualityGate, HealingReport, HealingAction } from '../types/failure';
 
 const CONTEXT = 'HtmlReport';
 
@@ -20,8 +20,10 @@ async function generate(): Promise<void> {
     const analysis = readJson<FailureAnalysis>(Paths.failureAnalysis());
     const validation = readJson<ValidationReport>(Paths.validationReport());
     const gate = readJson<FinalQualityGate>(Paths.finalQualityGate());
+    const healing = readJson<HealingReport>(Paths.healingAction());
 
-    const html = buildHtml(exec, analysis, validation, gate);
+    const html = buildHtml(exec, analysis, validation, gate, healing);
+
     const reportPath = path.join(Paths.reports, 'autonomous-report.html');
     
     fs.writeFileSync(reportPath, html);
@@ -36,8 +38,10 @@ function buildHtml(
   exec: ExecutionSummary,
   analysis: FailureAnalysis,
   validation: ValidationReport,
-  gate: FinalQualityGate
+  gate: FinalQualityGate,
+  healing: HealingReport
 ): string {
+
   const statusColor = gate.pipelineStatus === 'PASS' ? '#10b981' : gate.pipelineStatus === 'FAIL' ? '#ef4444' : '#f59e0b';
   const statusIcon = gate.pipelineStatus === 'PASS' ? '✅' : gate.pipelineStatus === 'FAIL' ? '❌' : '⚠️';
   const validatorStatusMap: Record<string, string> = {
@@ -121,36 +125,66 @@ function buildHtml(
                                 <tr class="text-gray-400 text-xs uppercase tracking-wider border-b">
                                     <th class="pb-3 px-2">Test Scenario</th>
                                     <th class="pb-3 px-2">AI Diagnosis</th>
-                                    <th class="pb-3 px-2">Confidence Level</th>
-                                    <th class="pb-3 px-2">Self-Healed?</th>
+                                    <th class="pb-3 px-2">Confidence</th>
+                                    <th class="pb-3 px-2 text-center">Status & Action</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
-                                ${analysis.failures.map(f => `
+                                ${analysis.failures.map(f => {
+                                    const validationResult = validation.results.find(r => 
+                                        r.testId.replace(/\\/g, '/') === f.testId.replace(/\\/g, '/') || 
+                                        r.testId.includes(f.title)
+                                    );
+                                    const healingAction = healing.actions.find(a => 
+                                        a.testId.replace(/\\/g, '/') === f.testId.replace(/\\/g, '/') ||
+                                        a.testId.includes(f.title)
+                                    );
+
+                                    const isHealed = validationResult?.status === 'PASS';
+                                    const statusLabel = isHealed ? 'Fixed' : (f.healable ? 'Manual Review' : 'App Bug');
+                                    const labelColor = isHealed ? 'bg-green-100 text-green-700' : (f.healable ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700');
+                                    
+                                    return `
                                     <tr>
                                         <td class="py-4 px-2">
                                             <div class="font-semibold text-gray-800 text-sm">${f.testId}</div>
-                                            <div class="text-xs text-red-500 truncate w-64 mt-1 font-mono">${f.errorSnippet}</div>
+                                            <div class="text-xs text-red-400 truncate w-64 mt-1 font-mono">${f.errorMessage || 'No error details'}</div>
+                                            ${!isHealed && healingAction ? `
+                                                <div class="mt-2 p-2 bg-orange-50 border border-orange-100 rounded text-[10px]">
+                                                    <span class="font-bold text-orange-800">💡 AI Recommendation:</span>
+                                                    <code class="block mt-1 text-gray-700 bg-white p-1 rounded border border-orange-200">
+                                                        ${(healingAction.after ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                                                    </code>
+                                                </div>
+                                            ` : ''}
                                         </td>
+
                                         <td class="py-4 px-2">
-                                            <span class="px-2 py-1 text-xs rounded bg-indigo-50 text-indigo-700 font-mono">
-                                                ${f.category.replace('_', ' ')}
+                                            <span class="px-2 py-1 text-xs rounded bg-indigo-50 text-indigo-700 font-mono uppercase">
+                                                ${f.failureType.replace('_', ' ')}
                                             </span>
                                         </td>
                                         <td class="py-4 px-2">
                                             <div class="flex items-center">
-                                                <div class="w-16 h-2 bg-gray-200 rounded-full mr-2">
-                                                    <div class="h-full bg-indigo-500 rounded-full" style="width: ${f.confidence * 100}%"></div>
+                                                <span class="text-xs font-mono mr-2">${(f.confidence * 100).toFixed(0)}%</span>
+                                                <div class="w-12 h-1 bg-gray-100 rounded-full">
+                                                    <div class="h-full bg-indigo-400 rounded-full" style="width: ${f.confidence * 100}%"></div>
                                                 </div>
-                                                <span class="text-xs font-mono">${(f.confidence * 100).toFixed(0)}%</span>
                                             </div>
                                         </td>
-                                        <td class="py-4 px-2 text-center text-lg">
-                                            ${validation.results.find(r => r.testId === f.testId)?.status === 'PASS' ? '✅' : '❌'}
+                                        <td class="py-4 px-2 text-center">
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl">${isHealed ? '✅' : '❌'}</span>
+                                                <span class="text-[10px] mt-1 px-2 py-0.5 rounded-full font-bold uppercase ${labelColor}">
+                                                    ${statusLabel}
+                                                </span>
+                                            </div>
                                         </td>
                                     </tr>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                                 ${analysis.failures.length === 0 ? '<tr><td colspan="4" class="py-8 text-center text-gray-400 italic">No failures detected in this pipeline run. Clean execution! ✨</td></tr>' : ''}
+
                             </tbody>
                         </table>
                     </div>
@@ -196,24 +230,38 @@ function buildHtml(
                         Self-Healing Intelligence
                     </h2>
                     <div class="space-y-4">
+                        ${analysis.failures.length === 0 ? `
+                            <div class="text-center py-6">
+                                <div class="text-4xl mb-2">🛡️</div>
+                                <div class="text-lg font-bold">System Stable</div>
+                                <p class="text-xs opacity-80 mt-2">All tests passed. No autonomous healing required for this cycle.</p>
+                            </div>
+                        ` : `
                         <div class="flex justify-between items-center text-sm">
                             <span class="opacity-80">Healable Issues Detected</span>
                             <span class="font-bold font-mono text-lg">${analysis.failures.filter(f => f.healable).length}</span>
                         </div>
                         <div class="flex justify-between items-center text-sm">
-                            <span class="opacity-80">Successful Resolutions</span>
-                            <span class="font-bold font-mono text-lg">${validation.nowPassing}</span>
+                            <span class="opacity-80">Resolved Failures</span>
+                            <span class="font-bold font-mono text-lg">${validation.results.filter(r => r.healingApplied && r.status === 'PASS').length}</span>
                         </div>
                         <div class="flex justify-between items-center text-sm">
                             <span class="opacity-80">Healing Success Rate</span>
-                            <span class="font-bold font-mono text-lg">${validation.healingSuccessRate}%</span>
+                            <span class="font-bold font-mono text-lg">${
+                                analysis.failures.filter(f => f.healable).length > 0 
+                                ? Math.round((validation.results.filter(r => r.healingApplied && r.status === 'PASS').length / analysis.failures.filter(f => f.healable).length) * 100)
+                                : 0
+                            }%</span>
                         </div>
                         <div class="pt-4 border-t border-indigo-400">
                              <div class="text-xs opacity-80 uppercase tracking-widest font-bold">Healer Outcome status:</div>
                              <div class="text-xl font-bold mt-1">${displayStatus}</div>
                         </div>
+                        `}
                     </div>
-                </section>      </section>
+                </section>
+
+      </section>
 
                 <!-- Configuration Info -->
                 <section class="card p-6">
@@ -249,7 +297,7 @@ function buildHtml(
         const ctx = document.getElementById('failureChart').getContext('2d');
         const failureData = ${JSON.stringify(
           analysis.failures.reduce((acc: Record<string, number>, f) => {
-            acc[f.category] = (acc[f.category] || 0) + 1;
+            acc[f.failureType] = (acc[f.failureType] || 0) + 1;
             return acc;
           }, {})
         )};
