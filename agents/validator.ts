@@ -45,11 +45,37 @@ async function validate(): Promise<void> {
     return;
   }
 
-  // Get unique files that were healed
-  const healedFiles = [...new Set(appliedActions.map((a) => a.filePath))];
-  logger.info(CONTEXT, `Re-running ${healedFiles.length} healed file(s)...`);
+  // Get unique files that were healed and normalize them for Playwright CLI
+  const healedFiles = [...new Set(appliedActions.map((a) => a.filePath))]
+    .map(f => f.replace(/\\/g, '/')) // Normalize to forward slashes
+    .filter(f => {
+      const exists = fs.existsSync(f);
+      if (!exists) logger.warn(CONTEXT, `  ⚠ Healed file not found at: ${f}`);
+      return exists;
+    });
 
-  const reRunReportPath = path.join(Paths.reports, 'validation-results.json');
+  if (healedFiles.length === 0) {
+    logger.error(CONTEXT, 'No valid healed files found to re-run. Check paths in healing-action.json.');
+    // Produce a failure report
+    const report: ValidationReport = {
+      reportId: generateId('validation'),
+      timestamp: nowIso(),
+      sourceHealingId: healingReport.healingId,
+      totalReRun: 0,
+      nowPassing: 0,
+      stillFailing: 0,
+      healingSuccessRate: 0,
+      results: [],
+      status: 'SAME',
+      notes: 'Healed files were reported but could not be found on disk.',
+    };
+    writeJson(Paths.validationReport(), report);
+    return;
+  }
+
+  logger.info(CONTEXT, `Re-running ${healedFiles.length} healed file(s): ${healedFiles.join(', ')}`);
+
+  const reRunReportPath = path.join(Paths.reports, 'validation-results.json').replace(/\\/g, '/');
 
   const result = spawnSync(
     'npx',
@@ -61,6 +87,7 @@ async function validate(): Promise<void> {
     }
   );
 
+
   if (result.stdout) process.stdout.write(result.stdout);
   if (result.stderr) process.stderr.write(result.stderr);
 
@@ -71,31 +98,43 @@ async function validate(): Promise<void> {
 
   if (fs.existsSync(reRunReportPath)) {
     try {
-      const pwResult = readJson<{ suites?: Array<{ specs?: Array<{ title?: string; ok?: boolean }> }> }>(reRunReportPath);
-      for (const suite of pwResult.suites ?? []) {
-        for (const spec of suite.specs ?? []) {
-          const testId = spec.title ?? 'unknown';
-          const wasHealed = appliedActions.some((a) => a.testId.includes(testId));
-          const status = spec.ok ? 'PASS' : 'FAIL';
+      const pwResult = readJson<any>(reRunReportPath);
+      
+      const collectSpecs = (suites: any[], parentFile: string = '') => {
+        for (const suite of suites) {
+          const currentFile = suite.file || parentFile;
+          if (suite.suites) collectSpecs(suite.suites, currentFile);
+          for (const spec of suite.specs ?? []) {
+            const specFile = spec.file || currentFile;
+            const fullId = specFile ? `${specFile}::${spec.title}` : spec.title;
+            const wasHealed = appliedActions.some((a) => a.testId.includes(spec.title) || a.testId === fullId);
+            const status = spec.ok ? 'PASS' : 'FAIL';
 
-          if (status === 'PASS') nowPassing++;
-          else stillFailing++;
+            if (status === 'PASS') nowPassing++;
+            else stillFailing++;
 
-          validationResults.push({
-            testId,
-            title: testId,
-            status,
-            healingApplied: wasHealed,
-          });
+            validationResults.push({
+              testId: fullId,
+              title: spec.title,
+              status,
+              healingApplied: wasHealed,
+            });
+          }
         }
+      };
+
+
+      if (pwResult.suites) {
+        collectSpecs(pwResult.suites);
       }
-    } catch {
-      logger.warn(CONTEXT, 'Could not parse re-run results — using exit code.');
+    } catch (err) {
+      logger.warn(CONTEXT, `Could not parse re-run results: ${(err as Error).message} — using exit code fallback.`);
       const status = result.status === 0 ? 'PASS' : 'FAIL';
       if (status === 'PASS') nowPassing = appliedActions.length;
       else stillFailing = appliedActions.length;
     }
   }
+
 
   const totalReRun = nowPassing + stillFailing;
   const healingSuccessRate = totalReRun > 0

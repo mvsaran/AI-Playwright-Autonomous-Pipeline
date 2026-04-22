@@ -22,12 +22,12 @@ test.describe('Shopping Cart — Automationexercise.com', () => {
 
   // TC-CART-001: Smoke — Add product to cart from products page
   test('TC-CART-001: User can add a product to the cart from the products page', async ({ page }) => {
-    await productsPage.navigate();
+    await productsPage.navigate({ timeout: 45000 });
     await productsPage.assertLoaded();
     await productsPage.addFirstProductToCart();
 
     // Modal/overlay appears after adding — go to cart
-    await productsPage.goToCartFromModal();
+    await productsPage.goToCartFromModal({ timeout: 20000 });
     await cartPage.assertLoaded();
     await cartPage.assertCartHasItems();
   });

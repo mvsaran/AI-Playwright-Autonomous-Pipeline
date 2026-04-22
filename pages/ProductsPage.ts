@@ -40,10 +40,11 @@ export class ProductsPage extends BasePage {
   }
 
   /** Navigate to the products page. */
-  async navigate(): Promise<void> {
+  async navigate(options?: { timeout?: number }): Promise<void> {
     await this.goto('/products');
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('domcontentloaded', options);
   }
+
 
   /** Assert the all products page is loaded. */
   async assertLoaded(): Promise<void> {
@@ -137,9 +138,9 @@ export class ProductsPage extends BasePage {
   }
 
   /** Click "View Cart" in the post-add-to-cart modal. */
-  async goToCartFromModal(): Promise<void> {
+  async goToCartFromModal(options?: { timeout?: number }): Promise<void> {
     const link = this.page.locator(PRODUCTS_SELECTORS.viewCartLink).first();
-    await link.waitFor({ state: 'visible', timeout: 5000 });
+    await link.waitFor({ state: 'visible', timeout: options?.timeout ?? 5000 });
     await link.click();
   }
 }

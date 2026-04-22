@@ -1,0 +1,266 @@
+[
+  {
+    "testId": "generated\\products.spec.ts::TC-PROD-001: Products page loads and displays product list",
+    "filePath": "tests\\generated\\products.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T07:58:55.756Z",
+    "runId": "analysis-123456"
+  },
+  {
+    "testId": "generated\\cart.spec.ts::TC-CART-001: User can add a product to the cart from the products page",
+    "filePath": "tests\\generated\\cart.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T08:08:00.275Z",
+    "runId": "analysis-20260421-080713"
+  },
+  {
+    "testId": "generated\\products.spec.ts::TC-PROD-004: Product detail page shows name, price, availability, and condition",
+    "filePath": "tests\\generated\\products.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": false,
+    "timestamp": "2026-04-21T08:08:04.654Z",
+    "runId": "analysis-20260421-080713"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-001: Navigate to Signup/Login page from home page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:21:07.654Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-002: New user can register with valid details",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:21:11.331Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-003: Login with valid credentials succeeds",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:21:14.119Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-004: Login with incorrect password shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": false,
+    "timestamp": "2026-04-21T09:21:18.555Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-005: Login with non-existent email shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": false,
+    "timestamp": "2026-04-21T09:21:21.657Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-006: Login with empty email shows browser validation",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:21:24.970Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-007: Logged-in user can logout and is redirected to login page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:21:28.622Z",
+    "runId": "analysis-9f3b2d1e-4b6c-4e3e-8f2d-7c9e5d8f4a6b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-002: New user can register with valid details",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": false,
+    "timestamp": "2026-04-21T09:28:22.203Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-003: Login with valid credentials succeeds",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:28:24.714Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-004: Login with incorrect password shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:28:29.187Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-005: Login with non-existent email shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:28:31.464Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-006: Login with empty email shows browser validation",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:28:33.844Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-007: Logged-in user can logout and is redirected to login page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:28:36.561Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\cart.spec.ts::TC-CART-004: Adding the same product twice updates quantity in cart",
+    "filePath": "tests\\generated\\cart.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:28:41.456Z",
+    "runId": "analysis-7f3b2c9d-1a4e-4b9f-9d5e-8f4c9a7d8e2b"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-001: Navigate to Signup/Login page from home page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:09.949Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-002: New user can register with valid details",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:12.308Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-003: Login with valid credentials succeeds",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:14.759Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-004: Login with incorrect password shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:17.701Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-005: Login with non-existent email shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:21.711Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-006: Login with empty email shows browser validation",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:24.737Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-007: Logged-in user can logout and is redirected to login page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T09:41:27.176Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\products.spec.ts::TC-PROD-004: Product detail page shows name, price, availability, and condition",
+    "filePath": "tests\\generated\\products.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": false,
+    "timestamp": "2026-04-21T09:41:29.584Z",
+    "runId": "analysis-123456789"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-001: Navigate to Signup/Login page from home page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T11:40:20.670Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-002: New user can register with valid details",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T11:40:24.098Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-003: Login with valid credentials succeeds",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T11:40:29.364Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-004: Login with incorrect password shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T11:40:32.890Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-005: Login with non-existent email shows error",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T11:40:36.774Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-006: Login with empty email shows browser validation",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-21T11:40:40.158Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-007: Logged-in user can logout and is redirected to login page",
+    "filePath": "tests\\generated\\auth.spec.ts",
+    "failureType": "locator_issue",
+    "fixApplied": false,
+    "timestamp": "2026-04-21T11:40:43.725Z",
+    "runId": "analysis-20260421-001"
+  },
+  {
+    "testId": "generated\\auth.spec.ts::TC-AUTH-001: Navigate to Signup/Login page from home page",
+    "filePath": "C:\\Users\\mvsar\\Projects\\AITESTPIPELINE\\tests\\generated\\auth.spec.ts",
+    "failureType": "timing_issue",
+    "fixApplied": true,
+    "timestamp": "2026-04-22T14:10:53.213Z",
+    "runId": "analysis-7f3b9d2e-4f8b-4c1e-9b3d-2e4f8b4c1e9b"
+  }
+]

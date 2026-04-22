@@ -1,0 +1,24 @@
+[
+  {
+    "runId": "exec-mo8eyo41-28ly",
+    "label": "local-run",
+    "timestamp": "2026-04-21T09:25:47.761Z",
+    "durationMs": 319695,
+    "passRate": 73.9,
+    "status": "PASS_WITH_WARNINGS",
+    "healedTests": 1,
+    "totalTests": 23,
+    "cost": 0.24633
+  },
+  {
+    "runId": "exec-moa4qt7k-xbjy",
+    "label": "local-run",
+    "timestamp": "2026-04-22T14:15:00.000Z",
+    "durationMs": 83996,
+    "passRate": 126.1,
+    "status": "PASS",
+    "healedTests": 7,
+    "totalTests": 23,
+    "cost": 0.679325
+  }
+]

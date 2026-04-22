@@ -18,8 +18,11 @@
     "ai:heal": "tsx agents/self-healer.ts",
     "ai:validate": "tsx agents/validator.ts",
     "ai:quality-gate": "tsx agents/quality-gate.ts",
+    "ai:report": "tsx scripts/generate-html-report.ts",
     "ai:pipeline": "tsx scripts/pipeline.ts",
+    "ai:fast-maintenance": "npm run ai:execute && npm run ai:analyze-failures && npm run ai:heal && npm run ai:validate && npm run ai:report",
     "ai:bootstrap": "tsx scripts/bootstrap.ts",
+
     "prepare": "tsx scripts/prepare-folders.ts"
   },
   "dependencies": {
